@@ -1,0 +1,36 @@
+version: '3'
+services:
+  # Database Service
+  postgres:
+    image: postgres:9
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_USER=tripal
+      - POSTGRES_PASSWORD=tripal
+    volumes:
+      - db_data:/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    networks:
+      - tripaldock
+
+  # Server (apache2, php7.1)
+  app:
+      depends_on:
+        - postgres
+      build: './app'
+      volumes:
+        - ./..:/var/www/html
+      ports:
+        - "3000:80"
+        - "2233:22"
+      networks:
+            - tripaldock
+      tty: true
+
+networks:
+  tripaldock:
+    driver: "bridge"
+volumes:
+  db_data:
+    driver: "local"
