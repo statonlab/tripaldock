@@ -24,7 +24,6 @@ $app = new \Symfony\Component\Console\Application();
 
 // Register commands
 $app->add(new \StatonLab\TripalDock\NewCommand());
-$app->add(new \StatonLab\TripalDock\SSHCommand());
 
 // Run the application
 try {
