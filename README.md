@@ -12,7 +12,7 @@ composer global require statonlab/tripaldock
 ### Creating a new tripal site
 Using the `new` command, you can create a fresh Tripal 3 site. The command will automatically
 download and install the dependencies as well as prepare Drupal and Tripal.
-```
+```bash
 # Create a new site and call it site_name
 tripaldock new site_name
 ```
@@ -27,7 +27,7 @@ for this site.
 To access your container and run commands directly within it, you may use the ssh command. This command will take you
 directly to `/var/www/html` which is where your Drupal resides. From there, you can run any command such as `drush`
 and interact with the database using `psql -U tripal`. 
-```
+```bash
 ./tripaldock ssh
 ```
 
