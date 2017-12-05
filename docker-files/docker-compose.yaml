@@ -6,11 +6,10 @@ services:
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_USER=tripal
-      - POSTGRES_PASSWORD=tripal
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=tripal
     volumes:
       - db_data:/var/lib/postgresql/data/pgdata
-    ports:
-      - 5432:5432
     networks:
       - tripaldock
 
@@ -18,12 +17,11 @@ services:
   app:
       depends_on:
         - postgres
-      build: './app'
+      build: './docker/app'
       volumes:
-        - ./..:/var/www/html
+        - .:/var/www/html
       ports:
         - "3000:80"
-        - "2233:22"
       networks:
             - tripaldock
       tty: true

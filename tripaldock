@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+/**
+ * TripalDock Entry Point
+ * ======================
+ *
+ * Register all commands using Symfony Console.
+ */
+
+// Load libraries
+if (file_exists(__DIR__.'/../../autoload.php')) {
+    require __DIR__.'/../../autoload.php';
+} elseif (file_exists(__DIR__.'/vendor/autoload.php')) {
+    require __DIR__.'/vendor/autoload.php';
+}
+
+require __DIR__.'/src/bootstrap.php';
+
+// Constants
+define("BASE_DIR", __DIR__);
+
+// Initiate application
+$app = new \Symfony\Component\Console\Application();
+
+// Register commands
+$app->add(new \StatonLab\TripalDock\NewCommand());
+$app->add(new \StatonLab\TripalDock\SSHCommand());
+
+// Run the application
+try {
+    $app->run();
+} catch (Exception $exception) {
+    echo $exception->getMessage()."\n";
+}

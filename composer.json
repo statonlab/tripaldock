@@ -8,6 +8,9 @@
         }
     ],
     "scripts": {
-        "post-install-cmd": "@php publish.php"
+        "post-install-cmd": "php ./src/publish.php"
+    },
+    "require": {
+        "symfony/console": "^4.0"
     }
 }

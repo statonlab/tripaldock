@@ -3,3 +3,9 @@
 
 # IDE Files
 .idea/
+
+# Composer Files
+vendor/
+
+# Test files
+test_site/

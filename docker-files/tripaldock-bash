@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if [ -f .env ]; then
+	source .env
+fi
+
+PS="$(docker-compose ps -q)"
+if [ ! -z PS ]; then
+	EXEC="yes"
+else
+	EXEC="no"
+fi
+
+# Run given commands
+if [ $# -gt 0 ]; then
+
+	if [ "$1" == "init" ]; then
+		echo "TRIPALDOCK: Initializing ..."
+		chmod +x tripaldock
+		echo "TRIPALDOCK: Done. You may use the local version of tripaldock directly from this folder ./tripaldock COMMAND"
+	elif [ "$1" == "ssh" ]; then
+
+		if [ $EXEC == "yes" ]; then
+			docker-compose exec app bash
+		else
+			docker-compose run --rm app bash
+		fi
+
+	fi
+else
+	echo "Please specify a command"
+fi
