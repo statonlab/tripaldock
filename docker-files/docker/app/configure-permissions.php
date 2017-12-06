@@ -1,5 +1,5 @@
 <?php
-$db_name = isset($argv[1]) ? $argv : false;
+$db_name = isset($argv[1]) ? $argv[1] : false;
 if($db_name === false) {
     exit(1);
 }
