@@ -45,6 +45,13 @@ class NewCommand extends Command
     protected $port = 3000;
 
     /**
+     * Elasticsearch port.
+     *
+     * @var int
+     */
+    protected $ESPort = 9200;
+
+    /**
      * Define the command.
      */
     public function configure()
@@ -70,7 +77,7 @@ class NewCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
 
         // Start progress bar
-        $this->io->progressStart(8);
+        $this->io->progressStart(9);
 
         // Create the site directory
         $this->io->text("TRIPALDOCK: Creating {$this->siteName}");
@@ -105,7 +112,12 @@ class NewCommand extends Command
         $this->installTripal();
         $this->progressAdvance();
 
+        // Publish TripalDock files
         $this->publishLocalTripaldock();
+        $this->progressAdvance();
+
+        // Install other packages
+        $this->installPackages();
         $this->progressAdvance();
 
         // Inform user of working port and commands
@@ -141,6 +153,15 @@ class NewCommand extends Command
             }
         } while ($file);
         $this->io->text("TRIPALDOCK: Using port {$this->port}");
+
+        $this->io->text("TRIPALDOCK: Selecting elasticsearch port");
+        do {
+            $file = @fsockopen('localhost', $this->ESPort);
+            if ($file) {
+                $this->io->text("TRIPALDOCK: Port {$this->ESPort} is in use incrementing to ".(++$this->ESPort));
+            }
+        } while ($file);
+        $this->io->text("TRIPALDOCK: Using port {$this->ESPort} for elasticsearch");
     }
 
     /**
@@ -172,6 +193,7 @@ class NewCommand extends Command
         $content = file_get_contents($this->directory.'/docker-compose.yaml');
         $content = str_replace('- POSTGRES_DB=tripal', "- POSTGRES_DB={$this->siteName}", $content);
         $content = str_replace('- "3000:80"', "- \"{$this->port}:80\"", $content);
+        $content = str_replace('- "9200:9200"', "- \"{$this->ESPort}:9200\"", $content);
         file_put_contents($this->directory.'/docker-compose.yaml', $content);
     }
 
@@ -212,7 +234,6 @@ class NewCommand extends Command
             "docker-compose exec app bash -c \"drush si {$options} && drush cc all\""
         );
         chdir($cwd);
-        system("curl -XGET \"localhost:{$this->port}\"");
     }
 
     /**
@@ -249,7 +270,7 @@ class NewCommand extends Command
      */
     protected function enableGeneralModules()
     {
-        $options = [
+        $enable = [
             'ctools',
             'date',
             'devel',
@@ -268,13 +289,22 @@ class NewCommand extends Command
             'field_formatter_class',
             'field_formatter_settings',
             'views_ui',
+            'admin_menu',
+            'admin_menu_toolbar',
         ];
-        $options = implode(' ', $options);
+        $enable = implode(' ', $enable);
+
+        $disable = [
+            'toolbar',
+            'overlay'
+        ];
+        $disable = implode(' ', $disable);
+
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        system(
-            "docker-compose exec app bash -c \"drush en -y {$options}\""
-        );
+        system("docker-compose exec app bash -c \"drush dl -y {$enable}\"");
+        system("docker-compose exec app bash -c \"drush en -y {$enable}\"");
+        system("docker-compose exec app bash -c \"drush dis -y {$disable}\"");
         chdir($cwd);
     }
 
@@ -335,7 +365,7 @@ class NewCommand extends Command
         );
         $cmd = "module_load_include('inc', 'tripal', 'tripal.drush'); drush_tripal_trp_run_jobs_install('tripal');";
         system(
-            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --user=tripal\""
+            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\""
         );
         chdir($cwd);
     }
@@ -349,7 +379,7 @@ class NewCommand extends Command
         $cwd = getcwd();
         chdir($cwd.'/docker');
         system(
-            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --user=tripal\""
+            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\""
         );
         chdir($cwd);
     }
@@ -372,5 +402,13 @@ class NewCommand extends Command
     {
         copy(BASE_DIR.'/docker-files/tripaldock-bash', $this->directory.'/tripaldock');
         system('chmod +x '.$this->directory.'/tripaldock');
+    }
+
+    protected function installPackages()
+    {
+        $cwd = getcwd();
+        chdir($cwd.'/docker');
+        system("docker-compose exec app bash -c \"composer global require statonlab/fields_generator\"");
+        chdir($cwd);
     }
 }

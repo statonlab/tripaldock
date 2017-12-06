@@ -23,12 +23,38 @@ Once the installation of the new site is completed, a copy of `tripaldock` will 
 This is your site's specific tripaldock. It provides a set of commands to interact directly with the container responsible
 for this site.
 
+#### Up and Down
+To start up the container:
+```bash
+./tripaldock up
+```
+
+To stop the container:
+```bash
+./tripaldock down
+```
+
 #### SSH
 To access your container and run commands directly within it, you may use the ssh command. This command will take you
 directly to `/var/www/html` which is where your Drupal resides. From there, you can run any command such as `drush`
 and interact with the database using `psql -U tripal`. 
 ```bash
 ./tripaldock ssh
+```
+
+#### Obtaining Logs
+You can use the `logs` command to obtain apache, php, postgres and elasticsearch logs:
+```bash
+./tripaldock logs # Get all available logs
+./tripaldock logs app # Get apache and php logs
+./tripaldock logs elasticsearch # Get elasticsearch logs
+./tripaldock logs postgres # Get DB logs
+```
+
+#### Remove and Destroy
+If you would like to completely remove the container from the system including volumes, run the rm command.
+```bash
+./tripaldock rm
 ```
 
 ## License
