@@ -33,12 +33,24 @@ if [ $# -gt 0 ]; then
 		docker-compose stop
 
 	elif [ "$1" == "logs" ]; then
-		if [ $# -eq 1 ]; then
+		if [ $# -eq 2 ]; then
 			docker-compose logs "$2"
 		else
 			docker-compose logs
 		fi
 
+	elif [ "$1" == "install" ]; then
+		if [ $# -lt 2 ]; then
+			echo "TRIPALDOCK: Please specify the module name."
+		else
+			if [ "$2" == "elasticsearch" ]; then
+				echo "TRIPALDOCK: Installing and enabling tripal elasticsearch including adding crontab entries and the downloading the php library"
+				docker-compose exec app bash -c "/install-tripal-elasticsearch.sh"
+			else
+				echo "Installing and enabling $2"
+				docker-compose exec app bash -c "cd /var/www/html && drush dl $2 -y && drush en $2 -y"
+			fi
+		fi
 	elif [ "$1" == "rm" ]; then
 		echo "Stopping and removing containers"
 		docker-compose stop
