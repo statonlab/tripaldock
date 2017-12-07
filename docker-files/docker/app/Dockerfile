@@ -46,11 +46,16 @@ EXPOSE 80
 COPY supervisord.conf /etc/supervisord.d/app.ini
 COPY apache.conf /etc/httpd/conf.d/apache.conf
 COPY configure-permissions.php /configure-permissions.php
+
+# Helper scripts
 COPY init-cron.sh /init-cron.sh
 RUN chmod +x /init-cron.sh
-
 COPY install-tripal-elasticsearch.sh /install-tripal-elasticsearch.sh
 RUN chmod +x /install-tripal-elasticsearch.sh
+
+# Pre-generated Files
+COPY basic_install.sql /basic_install.sql
+COPY settings.php /drupal.settings.php
 
 # Activation scripts
 COPY init.sh /usr/bin/init.sh
