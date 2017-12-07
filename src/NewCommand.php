@@ -76,9 +76,6 @@ class NewCommand extends Command
         $this->directory = "{$cwd}/{$this->siteName}";
         $this->io = new SymfonyStyle($input, $output);
 
-        // Start progress bar
-        $this->io->progressStart(9);
-
         // Create the site directory
         $this->io->text("TRIPALDOCK: Creating {$this->siteName}");
         if (! mkdir($this->directory)) {
@@ -87,6 +84,107 @@ class NewCommand extends Command
             return;
         }
         chdir($this->directory);
+
+        $profiles = [
+            'Basic Install: uses a pre-generated sql to build the database [fastest]',
+            'Full Install: installs everything from scratch [slowest]',
+        ];
+        $profile = $this->io->choice(
+            'Which type of install would you like? Please choose one of the following:',
+            $profiles
+        );
+        $selected_profile = intval(array_search($profile, $profiles));
+        if ($selected_profile === 0) {
+            $this->basicInstall();
+        } else {
+            $this->fullInstall();
+        }
+
+        // Move back to working directory
+        chdir($cwd);
+    }
+
+    /**
+     * Installs the db using a pre-generated SQL dump.
+     */
+    protected function basicInstall()
+    {
+        $this->io->progressStart(10);
+
+        $this->selectPort();
+        $this->progressAdvance();
+
+        // Publish docker files
+        $this->publishDockerFiles();
+        $this->progressAdvance();
+
+        // Publish bash script
+        $this->publishLocalTripaldock();
+        $this->progressAdvance();
+
+        // Download all dependencies
+        $this->getDependencies();
+        $this->progressAdvance();
+
+        // Download tripal
+        $this->downloadTripal();
+        $this->progressAdvance();
+
+        // Bring up the images
+        $this->start();
+        $this->progressAdvance();
+
+        // Create settings file on machine
+        $this->createSettingsFile();
+        $this->progressAdvance();
+
+        // Download modules
+        $this->downloadGeneralModules();
+        $this->progressAdvance();
+
+        // Install DB From SQL
+        $this->installDBFromSQL();
+        $this->progressAdvance();
+
+        // Enable all modules
+        $this->enableGeneralModules();
+        $this->progressAdvance();
+
+        $this->displaySuccessMessage();
+    }
+
+    /**
+     * Create settings file.
+     */
+    protected function createSettingsFile()
+    {
+        $this->io->text('Creating settings.php');
+
+        system(
+            "docker-compose exec app bash -c \"sed -i 's/DB_NAME_PLACEHOLDER/{$this->siteName}/g' /drupal.settings.php && mv /drupal.settings.php /var/www/html/sites/default/settings.php\"",
+            $exit_code
+        );
+    }
+
+    /**
+     * Install DB Dump
+     */
+    protected function installDBFromSQL()
+    {
+        $this->io->text('TRIPALDOCK: Installing Database');
+        system(
+            "docker-compose exec app bash -c \"PGPASSWORD=secret psql -U tripal -d {$this->siteName} -h postgres < /basic_install.sql\"",
+            $exit_code
+        );
+    }
+
+    /**
+     * Full install including preparing chado and site.
+     */
+    protected function fullInstall()
+    {
+        // Start progress bar
+        $this->io->progressStart(9);
         $this->progressAdvance();
 
         // Select port
@@ -120,13 +218,15 @@ class NewCommand extends Command
         $this->installPackages();
         $this->progressAdvance();
 
+        $this->displaySuccessMessage();
+    }
+
+    protected function displaySuccessMessage()
+    {
         // Inform user of working port and commands
         $this->io->success(
             "Tripal installed successfully! Visit http://localhost:{$this->port} to see your new site. The admin username is tripal and the password is secret."
         );
-
-        // Move back to working directory
-        chdir($cwd);
     }
 
     /**
@@ -261,10 +361,44 @@ class NewCommand extends Command
         $this->prepareSite();
 
         $this->io->text('TRIPALDOCK: Enabling general modules');
+        $this->downloadGeneralModules();
         $this->enableGeneralModules();
 
         $this->io->text('TRIPALDOCK: Configuring permissions');
         $this->configurePermissions();
+    }
+
+    /**
+     * Download general modules.
+     */
+    protected function downloadGeneralModules()
+    {
+        $enable_array = [
+            'ctools',
+            'date',
+            'devel',
+            'ds',
+            'link',
+            'entity',
+            'libraries',
+            'redirect',
+            'token',
+            'uuid',
+            'jquery_update',
+            'views',
+            'webform',
+            'field_group',
+            'field_group_table',
+            'field_formatter_class',
+            'field_formatter_settings',
+            'views_ui',
+            'admin_menu'
+        ];
+        $enable = implode(' ', $enable_array);
+        $cwd = getcwd();
+        chdir($cwd.'/docker');
+        system("docker-compose exec app bash -c \"drush dl -y {$enable}\"");
+        chdir($cwd);
     }
 
     /**
@@ -276,6 +410,7 @@ class NewCommand extends Command
             'devel',
             'libraries',
             'jquery_update',
+            'admin_menu',
         ];
         $enable = implode(' ', $enable_array);
 
@@ -287,14 +422,6 @@ class NewCommand extends Command
 
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        system("docker-compose exec app bash -c \"drush dl -y {$enable}\"");
-        $enable_array = array_merge(
-            $enable_array,
-            [
-                'admin_menu',
-            ]
-        );
-        $enable = implode(' ', $enable_array);
         system("docker-compose exec app bash -c \"drush en -y {$enable}\"");
         system("docker-compose exec app bash -c \"drush dis -y {$disable}\"");
         chdir($cwd);
