@@ -9,9 +9,9 @@ RUN set -x \
 	&& yum update -y
 
 # Install services
-# (Apache2, postgresql9, php7.1, curl, git, zip, unzip, supervisor)
+# (Apache2, postgresql9, php7.1, curl, git, zip, unzip, supervisor ... etc)
 RUN set -x \
- 	&& yum install -y wget curl git zip unzip httpd \
+ 	&& yum install -y wget curl git zip unzip httpd htop crontabs \
 	&& wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
     && wget http://rpms.remirepo.net/enterprise/remi-release-7.rpm \
     && rpm -Uvh remi-release-7.rpm epel-release-latest-7.noarch.rpm \

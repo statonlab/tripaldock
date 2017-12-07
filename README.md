@@ -3,7 +3,7 @@ Tripaldock is a command line tool that helps with creating and running Tripal si
 ## Installation
 It is preferable to install this tool using composer.
 
-```
+```bash
 composer global require statonlab/tripaldock
 ```
 
@@ -41,6 +41,10 @@ and interact with the database using `psql -U tripal`.
 ```bash
 ./tripaldock ssh
 ```
+Which is equivalent to running:
+```bash
+docker-compose exec app bash
+```
 
 #### Obtaining Logs
 You can use the `logs` command to obtain apache, php, postgres and elasticsearch logs:
@@ -51,9 +55,27 @@ You can use the `logs` command to obtain apache, php, postgres and elasticsearch
 ./tripaldock logs postgres # Get DB logs
 ```
 
-#### Remove and Destroy
-If you would like to completely remove the container from the system including volumes, run the rm command.
+#### Installing Drupal Modules
+TripalDock provides a special install command to pull known modules directly from git and use composer to install
+their library dependencies if available. However, if the module is not one of the listed below, it will use drush
+to attempt to install the module.
 ```bash
+./tripaldock install [MODULE NAME]
+```
+
+Known modules:
+- tripal_elasticsearch: installs the module along with elasticsearch-php library
+
+#### Running Drush
+You can also use tripaldock to run drush without having to access the container:
+```bash
+./tripaldock drush [ARGS]
+```
+
+#### Remove and Destroy
+If you would like to completely remove the container from the system including anonymous volumes, run the rm command.
+```bash
+# You will be prompted to confirm the action
 ./tripaldock rm
 ```
 

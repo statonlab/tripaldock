@@ -231,8 +231,10 @@ class NewCommand extends Command
         $cwd = getcwd();
         chdir($cwd.'/docker');
         system(
-            "docker-compose exec app bash -c \"drush si {$options} && drush cc all\""
+            "docker-compose exec app bash -c \"drush si {$options} && drush cc all\"",
+            $exit_code
         );
+        $this->handleSystemReturn($exit_code);
         chdir($cwd);
     }
 
@@ -246,9 +248,6 @@ class NewCommand extends Command
         $this->io->text('TRIPALDOCK: Downloading Tripal:7.x-3.x development version');
         $this->downloadTripal();
 
-        $this->io->text('TRIPALDOCK: Enabling general modules');
-        $this->enableGeneralModules();
-
         $this->io->text('TRIPALDOCK: Enabling Tripal');
         $this->enableTripal();
 
@@ -261,6 +260,9 @@ class NewCommand extends Command
         $this->io->text('TRIPALDOCK: Creating content types');
         $this->prepareSite();
 
+        $this->io->text('TRIPALDOCK: Enabling general modules');
+        $this->enableGeneralModules();
+
         $this->io->text('TRIPALDOCK: Configuring permissions');
         $this->configurePermissions();
     }
@@ -270,39 +272,29 @@ class NewCommand extends Command
      */
     protected function enableGeneralModules()
     {
-        $enable = [
-            'ctools',
-            'date',
+        $enable_array = [
             'devel',
-            'ds',
-            'link',
-            'entity',
             'libraries',
-            'redirect',
-            'token',
-            'uuid',
             'jquery_update',
-            'views',
-            'webform',
-            'field_group',
-            'field_group_table',
-            'field_formatter_class',
-            'field_formatter_settings',
-            'views_ui',
-            'admin_menu',
-            'admin_menu_toolbar',
         ];
-        $enable = implode(' ', $enable);
+        $enable = implode(' ', $enable_array);
 
         $disable = [
             'toolbar',
-            'overlay'
+            'overlay',
         ];
         $disable = implode(' ', $disable);
 
         $cwd = getcwd();
         chdir($cwd.'/docker');
         system("docker-compose exec app bash -c \"drush dl -y {$enable}\"");
+        $enable_array = array_merge(
+            $enable_array,
+            [
+                'admin_menu',
+            ]
+        );
+        $enable = implode(' ', $enable_array);
         system("docker-compose exec app bash -c \"drush en -y {$enable}\"");
         system("docker-compose exec app bash -c \"drush dis -y {$disable}\"");
         chdir($cwd);
@@ -361,13 +353,20 @@ class NewCommand extends Command
         $cwd = getcwd();
         chdir($cwd.'/docker');
         system(
-            "docker-compose exec app bash -c \"cd /var/www/html && drush --root=/var/www/html eval \\\"{$cmd}\\\"\""
+            "docker-compose exec app bash -c \"cd /var/www/html && drush --root=/var/www/html eval \\\"{$cmd}\\\"\"",
+            $exit_code_1
         );
         $cmd = "module_load_include('inc', 'tripal', 'tripal.drush'); drush_tripal_trp_run_jobs_install('tripal');";
         system(
-            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\""
+            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"",
+            $exit_code_2
         );
         chdir($cwd);
+        if (intval($exit_code_1) !== 0 || intval($exit_code_2) !== 0) {
+            $this->io->error(
+                "TRIPALDOCK: Unable to prepare chado. Please visit your site and follow the instructions to prepare chado."
+            );
+        }
     }
 
     /**
@@ -379,8 +378,14 @@ class NewCommand extends Command
         $cwd = getcwd();
         chdir($cwd.'/docker');
         system(
-            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\""
+            "docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"",
+            $exit_code
         );
+        if (intval($exit_code) !== 0) {
+            $this->io->error(
+                "TRIPALDOCK: Unable to prepare site! Please prepare the site by following Tripal's instructions."
+            );
+        }
         chdir($cwd);
     }
 
@@ -391,7 +396,12 @@ class NewCommand extends Command
     {
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        system("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"");
+        system("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"", $exit_code);
+        if (intval($exit_code) !== 0) {
+            $this->io->error(
+                'TRIPALDOCK: Permissions were not configured correctly. Please visit your site and fix them manually using the admin pages.'
+            );
+        }
         chdir($cwd);
     }
 
@@ -404,11 +414,22 @@ class NewCommand extends Command
         system('chmod +x '.$this->directory.'/tripaldock');
     }
 
+    /**
+     * Install fields generator.
+     */
     protected function installPackages()
     {
         $cwd = getcwd();
         chdir($cwd.'/docker');
         system("docker-compose exec app bash -c \"composer global require statonlab/fields_generator\"");
         chdir($cwd);
+    }
+
+    protected function handleSystemReturn($value)
+    {
+        $value = intval($value);
+        if ($value !== 0) {
+            throw new \Exception("Exited with code $value");
+        }
     }
 }

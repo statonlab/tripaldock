@@ -12,12 +12,11 @@ cd /var/www/html/sites/all/libraries
 if [ ! -d "elasticsearch-php" ]; then
 	mkdir elasticsearch-php
 	cd elasticsearch-php
-	echo "{" > composer.json
-	echo "}" > composer.json
+	printf "{}" > composer.json
 	composer require "elasticsearch/elasticsearch:~5.0"
 fi
 
 cd /var/www/html
 drush en -y tripal_elasticsearch
 
-cd CWD
+cd "$CWD"

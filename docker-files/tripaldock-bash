@@ -30,7 +30,7 @@ if [ $# -gt 0 ]; then
 		docker-compose up -d
 
 	elif [ "$1" == "down" ]; then
-		docker-compose stop
+		docker-compose down
 
 	elif [ "$1" == "logs" ]; then
 		if [ $# -eq 2 ]; then
@@ -43,18 +43,38 @@ if [ $# -gt 0 ]; then
 		if [ $# -lt 2 ]; then
 			echo "TRIPALDOCK: Please specify the module name."
 		else
-			if [ "$2" == "elasticsearch" ]; then
+			if [ "$2" == "tripal_elasticsearch" ]; then
 				echo "TRIPALDOCK: Installing and enabling tripal elasticsearch including adding crontab entries and the downloading the php library"
 				docker-compose exec app bash -c "/install-tripal-elasticsearch.sh"
 			else
-				echo "Installing and enabling $2"
+				echo "TRIPALDOCK: Installing and enabling $2"
 				docker-compose exec app bash -c "cd /var/www/html && drush dl $2 -y && drush en $2 -y"
 			fi
 		fi
+	elif [ "$1" == "drush" ]; then
+		shift 1
+		echo "TRIPALDOCK: Running drush $@"
+	 	docker-compose exec app bash -c "cd /var/www/html && drush $@"
+
+	elif [ "$1" == "self-update" ]; then
+		echo "TRIPALDOCK: Updating statonlab/tripaldock"
+		composer global update statonlab/tripaldock
+		echo "TRIPALDOCK: Copying new files"
+		cp -r ~/.composer/vendor/statonlab/tripaldock/docker-files/docker .
+		cp ~/.composer/vendor/statonlab/tripaldock/docker-files/tripaldock-bash tripaldock
+		./tripaldock init
+		echo "TRIPALDOCK: Would you like to replace your docker-compose.yaml file with a new one?"
+		select yn in "Yes" "No"; do
+  		  case $yn in
+        	Yes ) cp ~/.composer/vendor/statonlab/tripaldock/docker-files; break;;
+        	No ) echo "TRIPALDOCL: Done.";;
+    	  esac
+		done
+		echo "TRIPALDOCK: Done."
+
 	elif [ "$1" == "rm" ]; then
 		echo "Stopping and removing containers"
-		docker-compose stop
-		docker-compose rm -v
+		docker-compose down -v
 	fi
 else
 	echo "Please specify a command"
