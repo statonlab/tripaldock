@@ -151,6 +151,8 @@ class NewCommand extends Command
         $this->progressAdvance();
 
         $this->displaySuccessMessage();
+
+        $this->io->success('You chose "Basic Install". Please make sure to run `./tripaldock drush updatedb -y` to update your database.');
     }
 
     /**

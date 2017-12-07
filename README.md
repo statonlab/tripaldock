@@ -7,6 +7,12 @@ It is preferable to install this tool using composer.
 composer global require statonlab/tripaldock
 ```
 
+## Updating
+You can update tripaldock using your local tripaldock!
+```bash
+./tripaldock self-update
+```
+
 ## Documentation
 
 ### Creating a new tripal site
