@@ -126,12 +126,12 @@ class NewCommand extends Command
         $this->getDependencies();
         $this->progressAdvance();
 
-        // Download tripal
-        $this->downloadTripal();
-        $this->progressAdvance();
-
         // Bring up the images
         $this->start();
+        $this->progressAdvance();
+
+        // Download tripal
+        $this->downloadTripal();
         $this->progressAdvance();
 
         // Create settings file on machine
@@ -307,7 +307,7 @@ class NewCommand extends Command
         $this->io->text('TRIPALDOCK: Starting docker ...');
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        system('docker-compose up -d');
+        system('docker-compose up -d --build');
         system('docker-compose exec app bash -c "source ~/.bashrc"');
         chdir($cwd);
     }
