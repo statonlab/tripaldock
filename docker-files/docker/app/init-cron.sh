@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-echo "*/2 * * * * drush trp-run-jobs --username=tripal --root=/var/www/html" > crontab_entries
+echo "*/1 * * * * drush cron --root=/var/www/html" > crontab_entries
+echo "*/2 * * * * drush trp-run-jobs --username=tripal --root=/var/www/html" >> crontab_entries
 echo "*/5 * * * * drush cron-run queue_elasticsearch_dispatcher --root=/var/www/html" >> crontab_entries
 echo "*/5 * * * * drush cron-run queue_elasticsearch_queue_1 --root=/var/www/html" >> crontab_entries
 echo "*/5 * * * * drush cron-run queue_elasticsearch_queue_2 --root=/var/www/html" >> crontab_entries
