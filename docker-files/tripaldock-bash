@@ -53,8 +53,9 @@ if [ $# -gt 0 ]; then
 		fi
 	elif [ "$1" == "drush" ]; then
 		shift 1
-		echo "TRIPALDOCK: Running drush $@"
-	 	docker-compose exec app bash -c "cd /var/www/html && drush $@"
+        CMD="drush $@ --root=/var/www/html"
+        echo "TRIPALDOCK: Running $CMD"
+	 	docker-compose exec app bash -ic "$CMD"
 
 	elif [ "$1" == "self-update" ]; then
 		echo "TRIPALDOCK: Updating statonlab/tripaldock"
