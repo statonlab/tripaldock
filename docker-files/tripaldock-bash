@@ -64,13 +64,13 @@ if [ $# -gt 0 ]; then
 		cp -r ~/.composer/vendor/statonlab/tripaldock/docker-files/docker .
 		cp ~/.composer/vendor/statonlab/tripaldock/docker-files/tripaldock-bash tripaldock
 		./tripaldock init
-		echo "TRIPALDOCK: Would you like to replace your docker-compose.yaml file with a new one?"
-		select yn in "Yes" "No"; do
-  		  case $yn in
-        	Yes ) cp ~/.composer/vendor/statonlab/tripaldock/docker-files/docker-compose.yaml .; break;;
-        	No ) echo "";;
-    	  esac
-		done
+#		echo "TRIPALDOCK: Would you like to replace your docker-compose.yaml file with a new one?"
+#		select yn in "Yes" "No"; do
+#  		  case $yn in
+#        	Yes ) cp ~/.composer/vendor/statonlab/tripaldock/docker-files/docker-compose.yaml .; break;;
+#        	No ) echo "";;
+#    	  esac
+#		done
 		docker-compose up -d --build
 		echo "TRIPALDOCK: Done."
 
