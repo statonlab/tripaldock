@@ -19,9 +19,11 @@ require __DIR__.'/src/bootstrap.php';
 // Constants
 define("BASE_DIR", __DIR__);
 
-// Initiate application
-$app = new \Symfony\Component\Console\Application();
 
+$package = json_decode(file_get_contents(BASE_DIR.'/composer.json'));
+
+// Initiate application
+$app = new \Symfony\Component\Console\Application('TripalDock', $package->version);
 // Register commands
 $app->add(new \StatonLab\TripalDock\NewCommand());
 
