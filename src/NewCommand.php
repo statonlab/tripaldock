@@ -94,8 +94,9 @@ class NewCommand extends Command
             $profiles);
         $selected_profile = intval(array_search($profile, $profiles));
 
-        mkdir($cwd.'/modules');
-        mkdir($cwd.'/themes');
+        // Create the mapping dir
+        mkdir('modules');
+        mkdir('themes');
 
         if ($selected_profile === 0) {
             $this->basicInstall();
@@ -235,6 +236,7 @@ class NewCommand extends Command
         $this->start();
         $this->progressAdvance();
 
+        // Sleep to make sure all containers are up
         sleep(10);
 
         // Install drupal and enable tripal
