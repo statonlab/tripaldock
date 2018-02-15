@@ -18,8 +18,10 @@ services:
     depends_on:
       - postgres
     build: './docker/app'
+#    volumes:
+#      - .:/var/www/html
     volumes:
-      - .:/var/www/html:cached
+      - app2-sync:/var/www/html:nocopy # will be mounted on /var/www
     ports:
       - "3000:80"
     networks:
@@ -49,6 +51,8 @@ networks:
   tripaldock:
     driver: "bridge"
 volumes:
+  app2-sync:
+    external: true
   elasticsearch_data:
     driver: "local"
   db_data:

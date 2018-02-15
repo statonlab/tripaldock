@@ -318,8 +318,10 @@ class NewCommand extends Command
         $this->io->text('TRIPALDOCK: Setting up docker ...');
         $dockerDirectory = BASE_DIR.'/docker-files/docker';
         $dockerComposeFile = BASE_DIR.'/docker-files/docker-compose.yaml';
+        $dockerSyncFile = BASE_DIR.'/docker-files/docker-sync.yml';
         $this->exec("cp -r $dockerDirectory ./");
         $this->exec("cp $dockerComposeFile ./");
+        $this->exec("cp $dockerSyncFile ./");
         $content = file_get_contents($this->directory.'/docker-compose.yaml');
         $content = str_replace('- POSTGRES_DB=tripal', "- POSTGRES_DB={$this->siteName}", $content);
         $content = str_replace('- "3000:80"', "- \"{$this->port}:80\"", $content);
@@ -337,8 +339,10 @@ class NewCommand extends Command
         $this->io->text('TRIPALDOCK: Starting docker ...');
         $cwd = getcwd();
         chdir($cwd.'/docker');
+        $this->exec('docker-sync clean && docker-sync start');
         $this->exec('docker-compose up -d --build');
         $this->exec('docker-compose exec app bash -c "source ~/.bashrc"');
+        $this->exec('docker-sync sync');
         chdir($cwd);
     }
 
