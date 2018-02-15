@@ -19,7 +19,7 @@ services:
       - postgres
     build: './docker/app'
     volumes:
-      - .:/var/www/html
+      - .:/var/www/html:cached
     ports:
       - "3000:80"
     networks:
