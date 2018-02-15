@@ -93,6 +93,10 @@ class NewCommand extends Command
         $profile = $this->io->choice('Which type of install would you like? Please choose one of the following:',
             $profiles);
         $selected_profile = intval(array_search($profile, $profiles));
+
+        mkdir($cwd.'/modules');
+        mkdir($cwd.'/themes');
+
         if ($selected_profile === 0) {
             $this->basicInstall();
         } else {
@@ -149,7 +153,7 @@ class NewCommand extends Command
         $this->progressAdvance();
 
         // Download all dependencies
-        $this->getDependencies();
+        //$this->getDependencies();
         $this->progressAdvance();
 
         // Bring up the images
@@ -220,7 +224,7 @@ class NewCommand extends Command
         $this->progressAdvance();
 
         // Download dependencies
-        $this->getDependencies();
+        // $this->getDependencies();
         $this->progressAdvance();
 
         // Publish docker files
@@ -230,6 +234,8 @@ class NewCommand extends Command
         // Start up the container
         $this->start();
         $this->progressAdvance();
+
+        sleep(10);
 
         // Install drupal and enable tripal
         $this->installDrupal();
@@ -384,7 +390,7 @@ class NewCommand extends Command
         $this->enableTripal();
 
         $this->io->text('TRIPALDOCK: Applying patches');
-        $this->applyPatches();
+        // $this->applyPatches();
 
         $this->io->text('TRIPALDOCK: Preparing chado');
         $this->prepareChado();
@@ -471,7 +477,7 @@ class NewCommand extends Command
     protected function downloadTripal()
     {
         $cwd = getcwd();
-        chdir($cwd.'/sites/all/modules');
+        chdir($cwd.'/modules');
         $this->exec('git clone https://github.com/tripal/tripal.git');
         chdir($cwd);
     }
