@@ -14,7 +14,7 @@ class System
     public function exec($cmd) {
         $call = system($cmd, $return);
 
-        if(!$call) {
+        if($call === FALSE) {
             throw new SystemException("Unable to execute the following command\n$cmd");
         }
 

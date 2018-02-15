@@ -190,8 +190,7 @@ class NewCommand extends Command
     {
         $this->io->text('Creating settings.php');
 
-        $this->exec("docker-compose exec app bash -c \"sed -i 's/DB_NAME_PLACEHOLDER/{$this->siteName}/g' /drupal.settings.php && mv /drupal.settings.php /var/www/html/sites/default/settings.php\"",
-            $exit_code);
+        $this->exec("docker-compose exec app bash -c \"sed -i 's/DB_NAME_PLACEHOLDER/{$this->siteName}/g' /drupal.settings.php && mv /drupal.settings.php /var/www/html/sites/default/settings.php\"");
     }
 
     /**
@@ -202,8 +201,7 @@ class NewCommand extends Command
     protected function installDBFromSQL()
     {
         $this->io->text('TRIPALDOCK: Installing Database');
-        $this->exec("docker-compose exec app bash -c \"PGPASSWORD=secret psql -U tripal -d {$this->siteName} -h postgres < /basic_install.sql\"",
-            $exit_code);
+        $this->exec("docker-compose exec app bash -c \"PGPASSWORD=secret psql -U tripal -d {$this->siteName} -h postgres < /basic_install.sql\"");
     }
 
     /**
@@ -523,11 +521,11 @@ class NewCommand extends Command
         $cmd = "module_load_include('inc', 'tripal_chado', 'includes/tripal_chado.install'); tripal_chado_load_drush_submit('Install Chado v1.3');";
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $this->exec("docker-compose exec app bash -c \"cd /var/www/html && drush --root=/var/www/html eval \\\"{$cmd}\\\"\"",
-            $exit_code_1);
+        $exit_code_1 = $this->exec("docker-compose exec app bash -c \"cd /var/www/html && drush --root=/var/www/html eval \\\"{$cmd}\\\"\"",
+            true);
         $cmd = "module_load_include('inc', 'tripal', 'tripal.drush'); drush_tripal_trp_run_jobs_install('tripal');";
-        $this->exec("docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"",
-            $exit_code_2);
+        $exit_code_2 = $this->exec("docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"",
+            true);
         chdir($cwd);
         if (intval($exit_code_1) !== 0 || intval($exit_code_2) !== 0) {
             $this->io->error("TRIPALDOCK: Unable to prepare chado. Please visit your site and follow the instructions to prepare chado.");
@@ -544,8 +542,7 @@ class NewCommand extends Command
         $cmd = "module_load_include('inc', 'tripal_chado', 'includes/setup/tripal_chado.setup'); tripal_chado_prepare_drush_submit();";
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $this->exec("docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"",
-            $exit_code);
+        $exit_code = $this->exec("docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"");
         if (intval($exit_code) !== 0) {
             $this->io->error("TRIPALDOCK: Unable to prepare site! Please prepare the site by following Tripal's instructions.");
         }
@@ -561,7 +558,7 @@ class NewCommand extends Command
     {
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"", $exit_code);
+        $exit_code = $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"");
         if (intval($exit_code) !== 0) {
             $this->io->error('TRIPALDOCK: Permissions were not configured correctly. Please visit your site and fix them manually using the admin pages.');
         }

@@ -6,6 +6,8 @@
  *
  * Register all commands using Symfony Console.
  */
+// Constants
+define("BASE_DIR", __DIR__);
 
 // Load libraries
 if (file_exists(__DIR__.'/../../autoload.php')) {
@@ -15,10 +17,6 @@ if (file_exists(__DIR__.'/../../autoload.php')) {
 }
 
 require __DIR__.'/src/bootstrap.php';
-
-// Constants
-define("BASE_DIR", __DIR__);
-
 
 $package = json_decode(file_get_contents(BASE_DIR.'/composer.json'));
 
