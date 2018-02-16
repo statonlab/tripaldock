@@ -1,6 +1,6 @@
 {
     "name": "statonlab/tripaldock",
-    "version": "0.0.10",
+    "version": "0.1.0",
     "description": "Build a simple development environment for Tripal",
     "authors": [
         {
