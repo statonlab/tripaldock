@@ -83,7 +83,7 @@ if [ $# -gt 0 ]; then
 	elif [ "$1" == "self-update" ]; then
 		echo "TRIPALDOCK: Updating statonlab/tripaldock"
 		VENDOR_DIR=`composer global config --absolute vendor-dir`
-		composer global update statonlab/tripaldock
+		composer global require statonlab/tripaldock
 		echo "TRIPALDOCK: Copying new files"
 		cp -r "$VENDOR_DIR/statonlab/tripaldock/docker-files/docker" .
 		cp "$VENDOR_DIR/statonlab/tripaldock/docker-files/tripaldock-bash" ./tripaldock

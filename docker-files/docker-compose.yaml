@@ -22,7 +22,7 @@ services:
       - ./modules:/var/www/html/sites/all/modules/custom:cached
       - ./themes:/var/www/html/sites/all/themes:cached
       - ./libraries:/var/www/html/sites/all/libraries:cached
-      - ./files:/var/www/html/sites/default/files:cached
+      - ./default:/var/www/html/sites/default:cached
     ports:
       - "3000:80"
     networks:

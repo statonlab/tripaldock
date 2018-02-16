@@ -48,9 +48,21 @@ RUN cd /var/www/html \
    	&& mv drupal-7.56/.gitignore ./ \
    	&& mv drupal-7.56/.htaccess ./ \
    	&& rm -r drupal-7.56 drupal-7.56.tar.gz \
-   	&& mkdir /var/www/html/sites/all/modules/custom
+   	&& mkdir /var/www/html/sites/all/modules/custom \
+   	&& cd /var/www/html/sites/all/modules \
+   	&& drush dl -y ctools, date, devel, ds, link, entity, libraries, \
+       redirect, token, uuid, jquery_update, views, webform, field_group, \
+       field_group_table, field_formatter_class, field_formatter_settings,admin_menu
 
-# Expose http and ssh ports
+# Apply patches
+RUN wget --no-check-certificate https://drupal.org/files/drupal.pgsql-bytea.27.patch \
+    && patch -p1 < drupal.pgsql-bytea.27.patch \
+    && cd /var/www/html/sites/all/modules/views \
+    && wget --no-check-certificate https://raw.githubusercontent.com/tripal/tripal/7.x-3.x/tripal_chado_views/views-sql-compliant-three-tier-naming-1971160-30.patch \
+    && patch -p1 < views-sql-compliant-three-tier-naming-1971160-30.patch
+
+
+# Expose http port
 EXPOSE 80
 
 # Configuration files
@@ -65,8 +77,8 @@ COPY install-tripal-elasticsearch.sh /install-tripal-elasticsearch.sh
 RUN chmod +x /install-tripal-elasticsearch.sh
 
 # Pre-generated Files
-COPY basic_install.sql /basic_install.sql
 COPY settings.php /drupal.settings.php
+COPY default.settings.php /default.settings.php
 
 # Activation scripts
 COPY init.sh /usr/bin/init.sh

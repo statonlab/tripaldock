@@ -9,7 +9,7 @@ Supported services:
 It is preferable to install this tool using composer.
 
 ```bash
-composer global require statonlab/tripaldock:~0.1.0
+composer global require statonlab/tripaldock:~0.1.1
 ```
 
 ## Updating

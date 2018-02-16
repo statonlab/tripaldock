@@ -174,7 +174,7 @@ class NewCommand extends Command
         $this->progressAdvance();
 
         // Download modules
-        $this->downloadGeneralModules();
+        //$this->downloadGeneralModules();
         $this->progressAdvance();
 
         // Install DB From SQL
@@ -393,7 +393,7 @@ class NewCommand extends Command
         $options = implode(' ', $options);
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $this->exec("docker-compose exec app bash -c \"drush si {$options} && drush cc all\"");
+        $this->exec("docker-compose exec app bash -c \"cd /var/www/html && cp /default.settings.php sites/default/. && drush si {$options} && drush cc all\"");
         chdir($cwd);
     }
 
@@ -412,8 +412,8 @@ class NewCommand extends Command
         $this->io->text('TRIPALDOCK: Enabling Tripal');
         $this->enableTripal();
 
-        $this->io->text('TRIPALDOCK: Applying patches');
-        // $this->applyPatches();
+        //$this->io->text('TRIPALDOCK: Applying patches');
+        //$this->applyPatches();
 
         $this->io->text('TRIPALDOCK: Preparing chado');
         $this->prepareChado();
@@ -422,7 +422,7 @@ class NewCommand extends Command
         $this->prepareSite();
 
         $this->io->text('TRIPALDOCK: Enabling general modules');
-        $this->downloadGeneralModules();
+        // $this->downloadGeneralModules();
         $this->enableGeneralModules();
 
         $this->io->text('TRIPALDOCK: Configuring permissions');
