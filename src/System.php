@@ -15,7 +15,7 @@ class System
         $call = system($cmd, $return);
 
         if($call === FALSE || intval($return) !== 0) {
-            throw new SystemException("Unable to execute the following command\n$cmd");
+            throw new SystemException("The following command failed to execute\n$cmd");
         }
 
         return $return;
