@@ -1,15 +1,32 @@
 #!/usr/bin/env bash
 
-if [ -f .env ]; then
-	source .env
-fi
-
 PS="$(docker-compose ps -q)"
 if [ ! -z PS ]; then
 	EXEC="yes"
 else
 	EXEC="no"
 fi
+
+VENDOR_DIR=`composer global config --absolute vendor-dir`
+DB_NAME=`cat docker-compose.yaml | grep POSTGRES_DB | awk -F"=" '{print $2}'`
+DB_PASS=`cat docker-compose.yaml | grep POSTGRES_PASSWORD | awk -F"=" '{print $2}'`
+
+function help() {
+	echo "Available Commands:"
+	echo "   init: Prepare local tripaldock script\n"
+	echo "   ssh: Access the docker container with an interactive shell\n"
+	echo "   up: Start all containers\n"
+	echo "   down: Stop all containers\n"
+	echo "   logs (optional)[service]:"
+	echo "      Display logs for all available services or only the specified service"
+	echo "      [service]: one of app, postgres, or elasticsearch"
+	echo "                   app: Apache and PHP logs"
+	echo "                   postgres: Database logs"
+	echo "                   elasticsearch: Elasticsearch logs\n"
+	echo "   install (required)[module]:"
+	echo "      Installs, enables and configures a Drupal module"
+	echo "      [module]: machine name of a module such as tripal_elasticsearch\n"
+}
 
 # Run given commands
 if [ $# -gt 0 ]; then
@@ -77,7 +94,11 @@ if [ $# -gt 0 ]; then
 	elif [ "$1" == "rm" ]; then
 		echo "Stopping and removing containers"
 		docker-compose down -v
+	else
+		help
 	fi
 else
 	echo "Please specify a command"
+	echo "\n"
+	help
 fi
