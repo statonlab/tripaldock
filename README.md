@@ -4,7 +4,7 @@ Tripaldock is a command line tool that helps with creating and running Tripal si
 It is preferable to install this tool using composer.
 
 ```bash
-composer global require statonlab/tripaldock:~0.0.9
+composer global require statonlab/tripaldock:~0.1.0
 ```
 
 ## Updating
