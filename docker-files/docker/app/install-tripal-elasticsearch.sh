@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 CWD="$(pwd)"
 
-cd /var/www/html/sites/all/modules
+cd /var/www/html/sites/all/modules/custom
 
 if [ ! -d "tripal_elasticsearch" ]; then
 	git clone https://github.com/tripal/tripal_elasticsearch.git

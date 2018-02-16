@@ -433,7 +433,6 @@ class NewCommand extends Command
             'field_group_table',
             'field_formatter_class',
             'field_formatter_settings',
-            'views_ui',
             'admin_menu',
         ];
         $enable = implode(' ', $enable_array);
@@ -566,7 +565,7 @@ class NewCommand extends Command
     {
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $exit_code = $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"");
+        $exit_code = $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"", true);
         if (intval($exit_code) !== 0) {
             $this->io->error('TRIPALDOCK: Permissions were not configured correctly. Please visit your site and fix them manually using the admin pages.');
         }
