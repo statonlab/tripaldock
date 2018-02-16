@@ -1,4 +1,10 @@
 Tripaldock is a command line tool that helps with creating and running Tripal sites using docker.
+It utilizes Docker Compose to build a stack of configured containers to host all required services.
+Supported services:
+- Web Server (Apache2)
+- PHP (7.1)
+- PostgreSQL (9.6)
+- Elasticsearch (5.6)
 
 ## Installation
 It is preferable to install this tool using composer.
@@ -15,12 +21,19 @@ You can update tripaldock using your local tripaldock!
 
 ## Documentation
 
+### Required Software
+- [Composer](https://getcomposer.org)
+- [Docker](https://docs.docker.com/install)
+- [Docker compose](https://docs.docker.com/compose/install)
+
 ### Creating a new tripal site
 Using the `new` command, you can create a fresh Tripal 3 site. The command will automatically
 download and install the dependencies as well as prepare Drupal and Tripal.
 ```bash
 # Create a new site and call it site_name
 tripaldock new site_name
+
+# Navigate the new site
 cd site_name
 ```
 Please note that the parameter site_name is also going to be the name of your database.

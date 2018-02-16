@@ -181,11 +181,11 @@ class NewCommand extends Command
         $this->installDBFromSQL();
         $this->progressAdvance();
 
+        // Enable all modules
+        // $this->enableGeneralModules();
+
         // Change the site name from full install to something else
         $this->setSiteName();
-
-        // Enable all modules
-        $this->enableGeneralModules();
         $this->progressAdvance();
 
         $this->displaySuccessMessage();
@@ -224,8 +224,10 @@ class NewCommand extends Command
      */
     protected function setSiteName()
     {
-        $this->exec("docker-compose exec app bash -c \"drush variable-set site_name '{$this->siteName}' --root=/var/www/html\"", true);
-        $this->exec("docker-compose exec app bash -c \"drush variable-set site_slogan 'Build simple dev environments' --root=/var/www/html\"", true);
+        $this->exec("docker-compose exec app bash -c \"drush variable-set site_name '{$this->siteName}' --root=/var/www/html\"",
+            true);
+        $this->exec("docker-compose exec app bash -c \"drush variable-set site_slogan 'Build simple dev environments' --root=/var/www/html\"",
+            true);
     }
 
     /**
@@ -457,7 +459,7 @@ class NewCommand extends Command
         $enable = implode(' ', $enable_array);
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $this->exec("docker-compose exec app bash -c \"drush dl -y {$enable}\"");
+        $this->exec("docker-compose exec app bash -c \"cd /var/www/html && drush dl -y {$enable}\"");
         chdir($cwd);
     }
 
