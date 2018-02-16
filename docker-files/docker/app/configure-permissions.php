@@ -20,14 +20,15 @@ foreach ($pdo->query("SELECT name FROM tripal_bundle") as $row) {
 foreach ($bundles as $bundle) {
     array_push(
         $permissions,
-        ' view '.$bundle[0],
-        ' create '.$bundle[0],
-        ' edit '.$bundle[0],
-        ' delete '.$bundle[0]
+        "'view $bundle[0]'",
+        "'create $bundle[0]'",
+        "'edit $bundle[0]'",
+        "'delete $bundle[0]'"
     );
 }
 
 $string_permissions = implode(",", $permissions);
-$args = ['administrator', $string_permissions];
+$args = ['administrator', '"'.$string_permissions.'"'];
 $args = implode(' ', $args);
-exit(system("drush --root=/var/www/html role-add-perm {$args}") ? 0 : 1);
+$cmd = system("drush --root=/var/www/html role-add-perm {$args}", $return_var);
+exit(intval($return_var) !== 0 || $cmd === FALSE ? 1 : 0);

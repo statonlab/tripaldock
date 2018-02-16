@@ -11,6 +11,10 @@ else
 	EXEC="no"
 fi
 
+VENDOR_DIR="$(composer global config --absolute vendor-dir)"
+DB_NAME=`cat docker-compose.yaml | grep POSTGRES_DB | awk -F"=" '{print $2}'`
+DB_PASS=`cat docker-compose.yaml | grep POSTGRES_PASSWORD | awk -F"=" '{print $2}'`
+
 # Run given commands
 if [ $# -gt 0 ]; then
 
@@ -61,8 +65,8 @@ if [ $# -gt 0 ]; then
 		echo "TRIPALDOCK: Updating statonlab/tripaldock"
 		composer global update statonlab/tripaldock
 		echo "TRIPALDOCK: Copying new files"
-		cp -r ~/.composer/vendor/statonlab/tripaldock/docker-files/docker .
-		cp ~/.composer/vendor/statonlab/tripaldock/docker-files/tripaldock-bash tripaldock
+		cp -r "$VENDOR_DIR/statonlab/tripaldock/docker-files/docker" .
+		cp "$VENDOR_DIR/statonlab/tripaldock/docker-files/tripaldock-bash" ./tripaldock
 		./tripaldock init
 #		echo "TRIPALDOCK: Would you like to replace your docker-compose.yaml file with a new one?"
 #		select yn in "Yes" "No"; do
@@ -73,6 +77,21 @@ if [ $# -gt 0 ]; then
 #		done
 		docker-compose up -d --build
 		echo "TRIPALDOCK: Done."
+
+	elif [ "$1" == "psql" ]; then
+		shit 1
+		echo "TRIPALDOCK: Connecting to postgres"
+        docker-compose run --rm -e PGPASSWORD=$DB_PASS postgres psql -h postgres -U tripal -d $DB_NAME "$@"
+
+	elif [ "$1" == "pg_dump" ]; then
+		shift 1
+		echo "TRIPALDOCK: Dumping DB $DB_NAME"
+        docker-compose run --rm -e PGPASSWORD=$DB_PASS postgres pg_dump -h postgres -U tripal -d $DB_NAME "$@"
+
+	elif [ "$1" == "pg_restore" ]; then
+		shift 1
+		echo "TRIPALDOCK: Dumping DB $DB_NAME"
+        docker-compose run --rm -e PGPASSWORD=$DB_PASS postgres pg_restore -h postgres -U tripal -d $DB_NAME "$@"
 
 	elif [ "$1" == "rm" ]; then
 		echo "Stopping and removing containers"

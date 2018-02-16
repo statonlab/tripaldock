@@ -93,6 +93,11 @@ class NewCommand extends Command
         $profile = $this->io->choice('Which type of install would you like? Please choose one of the following:',
             $profiles);
         $selected_profile = intval(array_search($profile, $profiles));
+
+        // Create the mapping dir
+        mkdir('modules');
+        mkdir('themes');
+
         if ($selected_profile === 0) {
             $this->basicInstall();
         } else {
@@ -149,7 +154,7 @@ class NewCommand extends Command
         $this->progressAdvance();
 
         // Download all dependencies
-        $this->getDependencies();
+        //$this->getDependencies();
         $this->progressAdvance();
 
         // Bring up the images
@@ -220,7 +225,7 @@ class NewCommand extends Command
         $this->progressAdvance();
 
         // Download dependencies
-        $this->getDependencies();
+        // $this->getDependencies();
         $this->progressAdvance();
 
         // Publish docker files
@@ -230,6 +235,9 @@ class NewCommand extends Command
         // Start up the container
         $this->start();
         $this->progressAdvance();
+
+        // Sleep to make sure all containers are up
+        sleep(10);
 
         // Install drupal and enable tripal
         $this->installDrupal();
@@ -384,7 +392,7 @@ class NewCommand extends Command
         $this->enableTripal();
 
         $this->io->text('TRIPALDOCK: Applying patches');
-        $this->applyPatches();
+        // $this->applyPatches();
 
         $this->io->text('TRIPALDOCK: Preparing chado');
         $this->prepareChado();
@@ -425,7 +433,6 @@ class NewCommand extends Command
             'field_group_table',
             'field_formatter_class',
             'field_formatter_settings',
-            'views_ui',
             'admin_menu',
         ];
         $enable = implode(' ', $enable_array);
@@ -471,7 +478,7 @@ class NewCommand extends Command
     protected function downloadTripal()
     {
         $cwd = getcwd();
-        chdir($cwd.'/sites/all/modules');
+        chdir($cwd.'/modules');
         $this->exec('git clone https://github.com/tripal/tripal.git');
         chdir($cwd);
     }
@@ -558,7 +565,7 @@ class NewCommand extends Command
     {
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $exit_code = $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"");
+        $exit_code = $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"", true);
         if (intval($exit_code) !== 0) {
             $this->io->error('TRIPALDOCK: Permissions were not configured correctly. Please visit your site and fix them manually using the admin pages.');
         }
