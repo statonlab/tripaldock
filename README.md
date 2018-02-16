@@ -1,5 +1,4 @@
-Tripaldock is a command line tool that helps with creating and running Tripal sites using docker.
-It utilizes Docker Compose to build a stack of configured containers to host all required services.
+Tripaldock is a command line tool that helps with creating and running Tripal sites using docker. This tool is designed for developers and is not suitable for production. It utilizes Docker Compose to build a stack of configured containers to host all required services.
 Supported services:
 - Web Server (Apache2)
 - PHP (7.1)
