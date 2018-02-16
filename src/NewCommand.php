@@ -124,12 +124,16 @@ class NewCommand extends Command
 
         try {
             $this->system->exec($cmd);
+
+            return true;
         } catch (SystemException $exception) {
             $this->io->error($exception->getMessage());
 
             if (! $ignore_errors) {
                 exit(1);
             }
+
+            return false;
         }
     }
 
@@ -177,6 +181,9 @@ class NewCommand extends Command
         $this->installDBFromSQL();
         $this->progressAdvance();
 
+        // Change the site name from full install to something else
+        $this->setSiteName();
+
         // Enable all modules
         $this->enableGeneralModules();
         $this->progressAdvance();
@@ -205,8 +212,20 @@ class NewCommand extends Command
      */
     protected function installDBFromSQL()
     {
+        $sql_file = BASE_DIR.'/docker-files/docker/app/basic_install.sql';
         $this->io->text('TRIPALDOCK: Installing Database');
-        $this->exec("docker-compose exec app bash -c \"PGPASSWORD=secret psql -U tripal -d {$this->siteName} -h postgres < /basic_install.sql\"");
+        $this->exec("docker-compose run --rm -e PGPASSWORD=secret postgres psql --quiet -U tripal -d {$this->siteName} -h postgres < $sql_file");
+    }
+
+    /**
+     * Set the site name.
+     *
+     * @throws \Exception
+     */
+    protected function setSiteName()
+    {
+        $this->exec("docker-compose exec app bash -c \"drush variable-set site_name '{$this->siteName}' --root=/var/www/html\"", true);
+        $this->exec("docker-compose exec app bash -c \"drush variable-set site_slogan 'Build simple dev environments' --root=/var/www/html\"", true);
     }
 
     /**
@@ -534,7 +553,7 @@ class NewCommand extends Command
         $exit_code_2 = $this->exec("docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"",
             true);
         chdir($cwd);
-        if (intval($exit_code_1) !== 0 || intval($exit_code_2) !== 0) {
+        if ($exit_code_1 === false || $exit_code_2 === false) {
             $this->io->error("TRIPALDOCK: Unable to prepare chado. Please visit your site and follow the instructions to prepare chado.");
         }
     }
@@ -550,7 +569,7 @@ class NewCommand extends Command
         $cwd = getcwd();
         chdir($cwd.'/docker');
         $exit_code = $this->exec("docker-compose exec app bash -c \"drush --root=/var/www/html eval \\\"{$cmd}\\\" && drush --root=/var/www/html trp-run-jobs --username=tripal\"");
-        if (intval($exit_code) !== 0) {
+        if ($exit_code === false) {
             $this->io->error("TRIPALDOCK: Unable to prepare site! Please prepare the site by following Tripal's instructions.");
         }
         chdir($cwd);
@@ -565,8 +584,9 @@ class NewCommand extends Command
     {
         $cwd = getcwd();
         chdir($cwd.'/docker');
-        $exit_code = $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"", true);
-        if (intval($exit_code) !== 0) {
+        $exit_code = $this->exec("docker-compose exec app bash -c \"php /configure-permissions.php {$this->siteName}\"",
+            true);
+        if ($exit_code === false) {
             $this->io->error('TRIPALDOCK: Permissions were not configured correctly. Please visit your site and fix them manually using the admin pages.');
         }
         chdir($cwd);
