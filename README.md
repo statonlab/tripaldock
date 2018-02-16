@@ -21,8 +21,17 @@ download and install the dependencies as well as prepare Drupal and Tripal.
 ```bash
 # Create a new site and call it site_name
 tripaldock new site_name
+cd site_name
 ```
 Please note that the parameter site_name is also going to be the name of your database.
+
+#### Site Structure
+Once tripaldock is done creating your new site, a new directory (site_name) will be created.
+The directory contains multiple folders along with docker related files. The folders are:
+- modules: Maps to sites/all/modules/custom and should contain your custom modules. By default, this folder will have `tripal` in it.
+- themes: Maps to sites/all/themes and should contain your custom themes.
+- libraries: Maps to sites/all/libraries and should contain any Drupal libraries.
+- files: Maps to sites/default/files and should hold any custom files.
 
 ### Local Tripaldock
 Once the installation of the new site is completed, a copy of `tripaldock` will be placed within the resulting file.
