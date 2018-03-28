@@ -215,6 +215,7 @@ class NewCommand extends Command
         $sql_file = BASE_DIR.'/docker-files/docker/app/basic_install.sql';
         $this->io->text('TRIPALDOCK: Installing Database');
         $this->exec("docker-compose run --rm -e PGPASSWORD=secret postgres psql --quiet -U tripal -d {$this->siteName} -h postgres < $sql_file");
+        $this->exec("docker-compose run --rm drush updatedb -y");
     }
 
     /**
