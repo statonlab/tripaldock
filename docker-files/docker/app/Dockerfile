@@ -41,13 +41,12 @@ ENV PATH "$PATH:/root/.composer/vendor/bin"
 
 # Download drupal and other modules
 RUN cd /var/www/html \
-	&& wget https://www.drupal.org/files/projects/drupal-7.56.tar.gz \
-	&& tar -zxvf drupal-7.56.tar.gz \
-   	&& mv drupal-7.56/* ./ \
-   	&& mv drupal-7.56/.editorconfig ./ \
-   	&& mv drupal-7.56/.gitignore ./ \
-   	&& mv drupal-7.56/.htaccess ./ \
-   	&& rm -r drupal-7.56 drupal-7.56.tar.gz \
+	&& drush dl drupal-7 \
+   	&& mv drupal-7*/* ./ \
+   	&& mv drupal-7*/.editorconfig ./ \
+   	&& mv drupal-7*/.gitignore ./ \
+   	&& mv drupal-7*/.htaccess ./ \
+   	&& rm -r drupal-7.* \
    	&& mkdir /var/www/html/sites/all/modules/custom \
    	&& cd /var/www/html/sites/all/modules \
    	&& drush dl -y ctools, date, devel, ds, link, entity, libraries, \
