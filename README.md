@@ -107,6 +107,9 @@ If you would like to completely remove the container from the system including a
 # You will be prompted to confirm the action
 ./tripaldock rm
 ```
+## Drupal Security
+
+Drupal 7 is periodically updated with important security patches.  You should ensure that you keep your core Drupal software up to date and [visit the Drupal release website](https://www.drupal.org/project/drupal) for more information.
 
 ## License
-Copyright 2017 University of Tennessee Knoxville ([MIT](LICENSE))
+Copyright 2017 University of Tennessee Knoxville ([GPL](LICENSE))
