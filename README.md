@@ -101,6 +101,13 @@ You can also use tripaldock to run drush without having to access the container:
 ./tripaldock drush [ARGS]
 ```
 
+#### Connecting to Elasticsearch
+The tripal_elasticsearch module will require you to setup the correct hostname and port for your elasticsearch server.
+To use the elasticsearch that ships with this module, you should do the following:
+- Visit `/admin/tripal/extension/tripal_elasticsearch/connection`
+- Enter `http://elasticsearch` in the host field. You can omit the port.
+- Click the submit button.
+
 #### Remove and Destroy
 If you would like to completely remove the container from the system including anonymous volumes, run the rm command.
 ```bash
