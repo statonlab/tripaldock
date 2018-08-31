@@ -118,5 +118,15 @@ If you would like to completely remove the container from the system including a
 
 Drupal 7 is periodically updated with important security patches.  You should ensure that you keep your core Drupal software up to date and [visit the Drupal release website](https://www.drupal.org/project/drupal) for more information.
 
+## Video Tutorials
+
+#### Setting Up A Website From Scratch With TripalDock
+
+[![](http://img.youtube.com/vi/5SOfQLypvdE/0.jpg)](http://www.youtube.com/watch?v=5SOfQLypvdE "Setting Up A Website From Scratch With TripalDock")
+
+#### TripalDock Commands And Site Structure
+
+[![](http://img.youtube.com/vi/g_fmONUgG3s/0.jpg)](http://www.youtube.com/watch?v=g_fmONUgG3s "TripalDock Commands And Site Structure")
+
 ## License
 Copyright 2017 University of Tennessee Knoxville ([GPL](LICENSE))
