@@ -39,6 +39,13 @@ cd site_name
 ```
 Please note that the parameter site_name is also going to be the name of your database.
 
+### Admin Credentials
+
+These are the default credentials that tripaldock uses for the admin user:
+
+- **Username**: tripal
+- **Password**: secret
+
 #### Site Structure
 Once tripaldock is done creating your new site, a new directory (site_name) will be created.
 The directory contains multiple folders along with docker related files. The folders are:
