@@ -18,6 +18,8 @@ services:
     depends_on:
       - postgres
     build: './docker/app'
+    environment:
+      - PHP_MEMORY_LIMIT=2G
     volumes:
       - ./modules:/var/www/html/sites/all/modules/custom:cached
       - ./themes:/var/www/html/sites/all/themes:cached

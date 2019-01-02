@@ -215,7 +215,8 @@ class NewCommand extends Command
         $sql_file = BASE_DIR.'/docker-files/docker/app/basic_install.sql';
         $this->io->text('TRIPALDOCK: Installing Database');
         $this->exec("docker-compose run --rm -e PGPASSWORD=secret postgres psql --quiet -U tripal -d {$this->siteName} -h postgres < $sql_file");
-        $this->exec("docker-compose run --rm drush updatedb -y");
+        $this->exec("docker-compose exec app drush updatedb -y");
+        $this->exec("docker-compose exec app bash -c \"mkdir /var/www/html/sites/default/files && chown apache:apache /var/www/html/sites/default/files && chmod 755 /var/www/html/sites/default/files\"");
     }
 
     /**
@@ -351,7 +352,8 @@ class NewCommand extends Command
         $this->exec("cp -r $dockerDirectory ./");
         $this->exec("cp $dockerComposeFile ./");
         $content = file_get_contents($this->directory.'/docker-compose.yaml');
-        $content = str_replace('- POSTGRES_DB=tripal', "- POSTGRES_DB={$this->siteName}", $content);
+        $content = str_replace('- POSTGRES_DB=tripal', "- POSTGRES_DB={$this->siteName}",
+            $content);
         $content = str_replace('- "3000:80"', "- \"{$this->port}:80\"", $content);
         $content = str_replace('- "9200:9200"', "- \"{$this->ESPort}:9200\"", $content);
         file_put_contents($this->directory.'/docker-compose.yaml', $content);
