@@ -216,6 +216,7 @@ class NewCommand extends Command
         $this->io->text('TRIPALDOCK: Installing Database');
         $this->exec("docker-compose run --rm -e PGPASSWORD=secret postgres psql --quiet -U tripal -d {$this->siteName} -h postgres < $sql_file");
         $this->exec("docker-compose exec app drush updatedb -y");
+        $this->exec("docker-compose exec app bash -c \"mkdir /var/www/html/sites/default/files && chown apache:apache /var/www/html/sites/default/files && chmod 755 /var/www/html/sites/default/files\"");
     }
 
     /**
