@@ -1,5 +1,5 @@
 <?php
-
+ini_set('memory_limit', getenv('PHP_MEMORY_LIMIT') ?: '4G');
 /**
  * @file
  * Drupal site-specific configuration file.
